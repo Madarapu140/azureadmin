@@ -1,0 +1,37 @@
+Azure Backup & Recovery Service
+In a production env if u intend to use  virtual machine in a production purpose or some important purpose .
+
+Different ways o take backup
+ method-1:
+  while creating vm and enable the backup
+  VM creation -->under management menu --> enable Backup 
+
+methos-2:
+  if vm is already created then  click on
+ backup & disaster recovery --> create recovery service Vault 
+  recovery service vault holds backup copies and you can monitor backup vaults , backup vault is a special type of storage account that contains  virtual hard disk either we can create a new backup vault or u can use existing vault ,here we can also Choose backup policy as per our need .
+
+methos-3:
+  Instead of taking backup for 1 machines, we can also take multiple machines as well as for entire organisation or entire region as well as 
+
+create Recovery Services Vault(service in azure) by providing details of vault name, subscription  Region, 
+ backup storage redundency -  geo-redundent(preferrd for production)
+                              locally-redundant--lab environment to save cost 
+                              zone--redundant 
+
+networking :
+        Connectivity method :  Allow public access from all networks
+                                Deny public access and allow private access ( prefered for production environment)
+after creation of RECOVERY SERVICE VAULT  ->open --> 
+   Where is your workload running?  : it may be azure,On-premisis
+   What do you want to backup?:  VMs, Azure fileshares, AZURE SKUaL DB.
+
+create backup policy: 
+  u can define v=backup policy as hourly ,daily,weely, timings, scheduled for how many hours, Timezone 
+
+after that we have to enable backup 
+
+
+In the production environment, our first step is to create a recovery service vault in the same region as the VMs. Next, we carefully plan the backup schedule, considering input from the relevant teams and assessing the criticality of the data. Finally, we add the VMs to the backup process.  As a azure system admin , it is our duty to monitor the  backup on daily basis and act on the failure if any
+
+
