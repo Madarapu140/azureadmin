@@ -1,4 +1,5 @@
 Azure Backup & Recovery Service
+=====================================
 In a production env if u intend to use  virtual machine in a production purpose or some important purpose .
 
 Different ways o take backup
@@ -33,5 +34,24 @@ after that we have to enable backup
 
 
 In the production environment, our first step is to create a recovery service vault in the same region as the VMs. Next, we carefully plan the backup schedule, considering input from the relevant teams and assessing the criticality of the data. Finally, we add the VMs to the backup process.  As a azure system admin , it is our duty to monitor the  backup on daily basis and act on the failure if any
+
+In production any issues will come right so before itself they will take checklist and preactivities like websites folder backup ,dbs and automation backups.
+code and wesitex backup will take readyly 
+
+Under vms website backups and sl lo dbs backup, mostly every month they will follow this process, its onetime thing
+
+
+--------------------------------------------------------------------------
+How to restore a virtual machine from backup in Microsoft Azure
+
+2 options:
+ either u create a Copy of Vm from backup that will be copy of existing vm or u can replace the existing vm itself 
+
+Recovery service vault --> backup items --> select backupiteam ->Vm --> take restore VM(vm copy ) from particular time period and take backup
+-------------------------------------------------------------------q
+How to restore files or folder from an Azure VM backup
+
+
+
 
 
