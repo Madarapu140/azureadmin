@@ -1,0 +1,54 @@
+Azure DNS & Traffic Manager | Traffic Manager & DNS Deep Dive
+
+Praveen Korvi
+
+
+Azure Traffic Manager is a DNS-based traffic load balancer. This service allows you to distribute traffic to your public facing applications( through internet) across the global Azure regions.
+
+Generally when u run ur application you will select region and in that region in different availbility zones u will have ur applications then u will configure load balancer but ur application is running across different countries, that measn single site but famous in multiple countires.
+
+Example: 
+lets assume www.ABC.com is very famous in US and same as popular in INDIA also lot of trafic will from India and US as well as this will be in separate region and Us is in separate region
+ so whatever the backend servers ur creating so those servers serving this application  so front end You should create trafic manager .Here trffic manager eually distribute load  to backend servers .
+
+Generally we have a region inside region we have availability zones and in avaialbility zones we will create a VM and there u will create a load baalncer and trafic will comes to load blancer and moves to xones1,zone2,zone3 .
+
+If ur application is in across regions  so ur application one server is in US and other server is in INDIA why because who ever trying to access ur application the reuest shouldnt only goes to US and it should be goes to India as well as likewise we have to configure in this senario we will use trafic manager .
+
+scenario:
+ we are going to create a VM in  EAST US and another VM in west US and we will create a trafic manger , Est US and WESTUS were endpoints to trafic manager and whoevrr accessing through internet so it will come to the trafic manger and trafic managaer will routes trafic to these machines in 2 regions ,letss ay here if i install ngnix applications on both regions.
+ step1: Resource group 
+ we can create single resource group or u can create different reosurce groups as well 
+ when we create vms by defalt they were having public Ips so this is a DNS based load balancing meanss this traffic manager will not recognise this machine IPS ,in trafic manger we will trying to create endpoints ,while creating end points we need to give machines information then we are going to get one IP but traffic manager not going to recognise  IP so we should give the DNS names then only it will recognise .
+
+what is DNS?
+-------------------
+Remembering Ips is difficult 
+
+private DNS: It means we are configuring our domain names and under that we are going to create records 
+eupdviapp001.infosys.com like wise
+ eu-europe
+ pd:prod
+vi-virtual machine
+  app: application 
+Public  DNS servers: 
+  we dont manage it , whatevr we are accesing so many websites like google.com,flipkart.com all these websites are frontend userfriendly purpose its an alias names but in the baxckend they will use ip address only ,end of the day websites were running with Ips only , 
+whenever we buy any domain name that domain name should be added to public DNS servers so that it can be accessed throughout the world and if this machine entries were added in ur  DNS then within this network only it will accessible thats why we called it as private DNS which we were managing ,public DNS we are not managing .
+we will purchase the domans from GODADY, BIGROCK ,thse web hosting platforms will host my website on their servers he will add my doman anme into public dns servers then only it will visisble to across the world otherwise it wont  accaess it via internet .
+
+install nginx websever for testing
+ sudo at update
+ apt installl nginx
+ /etc/init.d/nginx status( to check )
+
+add inbound rule in nsg 
+
+once trafic manger is created 
+
+create an endpoints in trafic manager  
+ why trafic manger is not recognising ip address because when ip is changed then it will not send trafiic to vms 
+
+
+we will create a DNS zones and we will write alias 
+basicaly it is like valaxy.traficmanger.net  if we give aias means  valaxy.in or valaxy.com etc 
+
