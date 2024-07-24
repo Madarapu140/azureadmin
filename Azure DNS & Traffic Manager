@@ -21,6 +21,21 @@ scenario:
  we can create single resource group or u can create different reosurce groups as well 
  when we create vms by defalt they were having public Ips so this is a DNS based load balancing meanss this traffic manager will not recognise this machine IPS ,in trafic manger we will trying to create endpoints ,while creating end points we need to give machines information then we are going to get one IP but traffic manager not going to recognise  IP so we should give the DNS names then only it will recognise .
 
+####################################################################
+az group create -l westus -n AzureTraffic-DNS
+
+az network vnet create -g AzureTraffic-DNS --location eastus -n EASTUS-RG-vNET1 --address-prefix 10.10.0.0/16 --subnet-name EASTUS-RG-subnet1 --subnet-prefix 10.10.1.0/24
+az network vnet create -g AzureTraffic-DNS --location westus -n WESTUS-01-vNET1 --address-prefix 172.16.0.0/16 --subnet-name WESTUS-01-subnet1 --subnet-prefix 172.16.1.0/24
+
+
+az vm create --resource-group AzureTraffic-DNS --location eastus --name EASTUS-VM1 --image UbuntuLTS --vnet-name EASTUS-RG-vNET1 \
+--subnet EASTUS-RG-subnet1 --admin-username cloudfreak --admin-password "Zoom@12345678" --size Standard_B1s
+
+az vm create --resource-group AzureTraffic-DNS --location westus --name WESTUS-VM1 --image UbuntuLTS --vnet-name WESTUS-01-vNET1 \
+--subnet WESTUS-01-subnet1 --admin-username cloudfreak --admin-password "Zoom@12345678" --size Standard_B1s 
+
+
+*****************************************************************************************
 what is DNS?
 -------------------
 Remembering Ips is difficult 
