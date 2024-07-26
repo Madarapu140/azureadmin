@@ -100,3 +100,25 @@ for suppose www.init6tech.com  basically in GOdaddy once we create alias in DNS 
 
 create DNS ZONES:
   Name should be whatever ur doman name ur purchasing from godaddy that should be name of DNs zones like  init6tech.com we have to add ,you should give whatever the doman name u purchased it should give here 
+  we are going to update 4 server detasl in godaddy
+ Name server 1
+:
+ns1-01.azure-dns.com.
+Name server 2
+:
+ns2-01.azure-dns.net.
+Name server 3
+:
+ns3-01.azure-dns.org.
+Name server 4
+:
+ns4-01.azure-dns.info.
+
+
+after creation of DNS ZONE --> CREATE a record set 
+ Name: www
+Type: CNAME: LINK UR SUBDOMAIN TO ANOTHER RECORD 
+
+Name servers will create a records in DNS zones ,
+
+when someone accessing the website it will go t o the GODADDY and godaddy DNS servers were related to the azure DNS servers then it will come here and check weather record is avalablw or not because user is trying with init6tech.com then DNS servers will check weather any DNS record with that name, it will find one record then it will route the trafic to balu.trafficmanager.net then it will come to trafic maner of vms whatevr the content in Vms will then user can able to access it.
