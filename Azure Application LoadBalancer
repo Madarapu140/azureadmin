@@ -1,0 +1,160 @@
+Azure Application LoadBalancer 
+
+Azure : Basic load balancer & azure standard load balancer (L4)
+        APPLICATION Gateway (L7)
+AWS: Network loadbalancer 
+     Application load balancer
+
+when u start e-commerse business obviously very less users and lateron increasing we will addon few more servers , then all these server Ips were configured to loadbalancer and load balancer ip with the doman name ,loadbancer will takes the reuest and route the trafic to each and every machine 
+
+according to OSI model we have different layers
+ Application layer-L7  ---> APPLICATION GATEWAY
+presentation layer -L6
+session layer' -L5
+transport layer -L4    ---> Load balancer 
+network layer-L3
+datalink layer-L2
+physical layer -L1
+
+Differences:
+ Azure loadbalancer is a TCP protocal , it is going to accept every type of communication but Application gateway only works with Http &Https protocals which means only web servers ,if any web servers wants to configure then only it is going to acccept this application gateway
+
+while creation of itself u have to decide weather u wants to create a Zone-redundent or non-zone redundent load balancer ,if u create zone-redundent loadbalancer then obviously u have high availability 
+If traffic is between the rgions,Mostly we use azure load balancer within region only, if it for global then obvilously we will go for traffic manager .
+
+within region we will use loadbalancer 
+Here within a region you have an application and people were accessing,lets say ur in India myntra people mostly will be used and u created a servers in India region and u running ur applications most of the senarios 70% is same so load balncer will be used in most of the projects .
+whenever ur applications were running on different regions then u need to configure trafic manager.
+
+Here we have to create AVAILABILITY SETS why because loadbalancer expects ur machines should be created under the Availability sets why because purpose of loadbalancer is eually distribute the trafic across all these machines ,if u dont create in availability sets then load balancer is not going to acccept to add this machines or map these machines to load balancer why because if there is no high Availability its a problem
+
+Load balancer will acccepts either AUTOSCALING of VMS or better to create vms under the Availability set features so that in datacenter it is highly avaialabile
+==============================================
+
+
+az group create -l eastus -n AzureRG1
+
+
+az network vnet create -g AzureRG1 -n AzureRG1-vNET1 --address-prefix 10.2.0.0/16 --subnet-name AzureRG1-subnet1 --subnet-prefix 10.2.1.0/24 -l eastus
+
+az network vnet subnet create -g AzureRG1 --vnet-name AzureRG1-vNET1 -n AzureRG1-subnet-2 --address-prefixes 10.2.2.0/24
+az network vnet subnet create -g AzureRG1 --vnet-name AzureRG1-vNET1 -n AzureRG1-subnet-3 --address-prefixes 10.2.3.0/24 
+
+
+
+az network nsg create -n host_nsg -g AzureRG1 -l eastus
+
+az network nsg rule create -g AzureRG1 eastus --nsg-name host_nsg -n tes --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' --destination-address-prefixes '*' \
+--destination-port-ranges '*' --access Allow --protocol Tcp --description "Allowing All Traffic  for now"
+
+######################## Creating AZ Set #############################
+
+az vm availability-set create --name EAST-AVSET1 -g AzureRG1 --location eastus --platform-fault-domain-count 3 --platform-update-domain-count 5
+
+#################### Creating public ip #############################
+
+az network public-ip create --name Azurepubip -g AzureRG1 --location eastus --sku Standard --allocation-method Static 
+
+az network public-ip create --name Azurepubip2 -g AzureRG1 --location eastus --sku Standard --allocation-method Static
+
+az network public-ip create --name Azurepubip3 -g AzureRG1 --location eastus --sku Standard --allocation-method Static
+
+
+az network public-ip create --name Azurepubip4 -g AzureRG1 --location eastus --sku Standard --allocation-method Static
+#################### Creating VMs ######################################
+
+az vm create --resource-group AzureRG1 -l eastus --name LinuxTestVM1 --image UbuntuLTS --vnet-name AzureRG1-vNET1 \
+--subnet AzureRG1-subnet1 --admin-username cloudfreak --admin-password "Zoom@12345678" --size Standard_B1s \
+--availability-set EAST-AVSET1 --nsg host_nsg -l eastus --public-ip-address Azurepubip
+
+
+az vm create --resource-group AzureRG1 -l eastus --name LinuxTestVM2 --image UbuntuLTS --vnet-name AzureRG1-vNET1 \
+--subnet AzureRG1-subnet-2 --admin-username cloudfreak --admin-password "Zoom@12345678" --size Standard_B1s \
+--availability-set EAST-AVSET1 --nsg host_nsg --public-ip-address Azurepubip2
+
+az vm create --resource-group AzureRG1 -l eastus --name LinuxTestVM3 --image UbuntuLTS --vnet-name AzureRG1-vNET1 \
+--subnet AzureRG1-subnet-3 --admin-username cloudfreak --admin-password "Zoom@12345678" --size Standard_B1s \
+--availability-set EAST-AVSET1 --nsg host_nsg --public-ip-address Azurepubip3
+
+
+
+az vm create --resource-group AzureRG1 -l eastus --name LinuxTestVM4 --image UbuntuLTS --vnet-name AzureRG1-vNET1 \
+--subnet AzureRG1-subnet-2 --admin-username cloudfreak --admin-password "Zoom@12345678" --size Standard_B1s \
+--availability-set EAST-AVSET1 --nsg host_nsg --public-ip-address Azurepubip4
+
+############################################################################################################################
+
+Things to create
+=============
+ Resource group, Vnet and 3 subnets, NSG,
+NSG rule 
+Availablity set 
+creating public ips
+creating Vms 
+
+Instead of creating 2 Nsgs we are creating one NSG and associating port 80 to al vms directly taking one nsg and associate with al vms 
+create AVilability zone and this availability zne will be attached at the time of creation of Vms 
+we have create static public ip and attach that static public ip to Vm
+
+If u dont create public ips ur vms will create ips and that ips would be dynamic ips ,here we are adding public ips of vm to loadbalancer ,if not means when u restat or reboot ur vms ips will change know then load baanaer wont recognise the vm 
+
+
+Difference b/w public and privateip
+public ip measn through internet u can able to acess anything
+privateip measn within network only u can able to access
+
+Difference between static and dynamic ip?
+ The ip ur assaiging statically either to public or private ip that measn which cant be share
+ The ip ur assaigning dynamically to either public or private ip that measn it may vary dynamically
+
+Install Nginx into machine
+ /etc/init.d/nginx status
+cd /var/www/html/
+vi index.nginx-debian.html 
+/etc/init.d/nginx restart
+
+
+Now environments were ready lets configure load blancer for this application so that load will be eually distribute among 2 servers when the traffic is comming from the internet 
+
+create loadbalancer
+ create frontend ip configuration 
+------------------------------------
+         for loadbalancer we need an ip 
+A frontend IP configuration is an IP address used for inbound and/or outbound communication as defined within load balancing, inbound NAT, and outbound rules.
+
+Loadbalncer ip should be static 
+
+Backendpools
+-------------
+  IP configurations associated to virtual machines and virtual machine scale sets must be in same location as the load balancer and be in the same virtual network.
+  here we can see the Vms which we create earlier and add all these vms to Backendpools
+
+Inbound rules
+------------: it helps in mapping the both frontend and backendpools 
+
+TO know application running on each port:  netstat -ntlp
+
+port it measn when 24.10.13.25: 3000 like wew ill give know while accessing ;loadbalancer
+ backendport :80 ( nginx is running on port no 80) 
+
+create healthprobe:
+------------------
+Health probes are used to check the status of a backend pool instance. If the health probe fails to get a response from a backend instance then no new connections will be sent to that backend instance until the health probe succeeds again.
+
+4.157.254.215 : 3500 ( i added the port) 
+now  when we hit loadbalncer ip we can able to access both the servers
+ Welcome to nginx-VM2!
+Welcome to nginx-VM1!
+
+Our moto to access it via doman name not by Ip addresses
+  -------------------------------------------------
+create DNS zones 
+create records in DNS zones
+ update the DNS servers in GODADDY and which we got DNS servers from DNS zones 
+
+In the record set here 
+name: www
+type: A- Address record for IPV4 (because loadbalancer having DNS of ip address where as in Trafic manager it has DNS name)
+Alias record set: yes 
+
