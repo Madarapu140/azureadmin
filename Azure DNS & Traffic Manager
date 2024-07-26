@@ -1,7 +1,7 @@
 Azure DNS & Traffic Manager | Traffic Manager & DNS Deep Dive
 
 Praveen Korvi
-
+Route53 and traffic manager both were same but in route53 is a single service where as in azure we have trafic manager and DNS is separate in route53 we haave a option to buy a doman anmes as well but here u cant have option to buy a doman anmes 
 
 Azure Traffic Manager is a DNS-based traffic load balancer. This service allows you to distribute traffic to your public facing applications( through internet) across the global Azure regions.
 
@@ -122,3 +122,17 @@ Type: CNAME: LINK UR SUBDOMAIN TO ANOTHER RECORD
 Name servers will create a records in DNS zones ,
 
 when someone accessing the website it will go t o the GODADDY and godaddy DNS servers were related to the azure DNS servers then it will come here and check weather record is avalablw or not because user is trying with init6tech.com then DNS servers will check weather any DNS record with that name, it will find one record then it will route the trafic to balu.trafficmanager.net then it will come to trafic maner of vms whatevr the content in Vms will then user can able to access it.
+
+after accessing the content in the wbsite we will add certifictaes i,e SSL certificate to that website and make them secure 
+
+cd /var/www/html/  this is default path for any website html page 
+
+/etc/init.d/nginx restart    (part of website)
+
+Routhing methods:
+====================
+ whenevr ur configuring trafic manager based upon ur reuirements you should configure the routing methods among al 4 were very imp
+ a)priority: when u wants to send alll trafic to one region like eastus and westus acts like a passive if this fals trafic will maoves to westus like backup server 
+ b)weighted: it means we have multiple endpoints in both regions ,so if u wants to route more trafic to eastus then more weight value u has to enter here like500 wight, and second case if u wants to route to trafic to both endpoints means then 250 in one region and 250 in another region 
+ c)geographical
+  d) performance: assume one is eastus and another is in Europe then traffic manager will decides which endpoint is closer to user
