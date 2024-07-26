@@ -63,7 +63,40 @@ once trafic manger is created
 create an endpoints in trafic manager  
  why trafic manger is not recognising ip address because when ip is changed then it will not send trafiic to vms 
 
+Trafic manager-->End points -->ADD --> 
+
+Type
+Azure endpoint
+Name: eastusendpoint
+Target resource type: public IPaddrsses
+ weight value : we have to give
+
+after configuring DNS on VM only we can able to pickup ipaddress  then add
+
+create DNS:
+  eastusvm001.eastus.cloudapp.azure.com  looks like this 
+  eastusvm001  this we added name 
 
 we will create a DNS zones and we will write alias 
-basicaly it is like valaxy.traficmanger.net  if we give aias means  valaxy.in or valaxy.com etc 
+basicaly it is like valaxy.traficmanger.net  if we give aias means  valaxy.in or valaxy.com etc .
 
+In this demonestration we have used only 2 vms in different regions but in real worls we have multiple vms we will place across multiple regions.
+
+Basicaly trffic manger identifies the DNS names but backend it uses the public IPS 
+after adding endpoints in Trafic manager ,DNS name looks like this
+
+  DNS name
+:
+http://balu.trafficmanager.net
+
+here our reuirement is  traficmanager.net is the doman name which was provided by azure whennwe want our own doman name means  balu.in, balu.com likewise .
+
+public DNS:
+   we will get it from   DNS zones in azure, In aws we will have ROUTE53 we will purchase doamin names from it if u buy domain then aws will mantans the DNS names ,but azure is not providing any facility to buy a doman names so obviously we whave to go through GODADDY any purchase doman names .
+Once we buy a doman names from godaddy they have their own public DNS servers and they will add their particular doman anames insides their DNS servers assuming that ur going to host the application whata re the purpose u  purchases doman they will host on their backend servers , but we have our own environment here everything is ready ,
+we just want only domain name for that purpose we will create a DNS Zones here and whatever the four DNS servers we will get that names we are going to  update in the GODADDY , so whenever someone is going to access through internet this particular ABC.COM this will go to the GODADDY then back in it send to the DNS servers about the entry and when it sent information to this DNS servers here we have a records  balu.in is alias to  http://balu.trafficmanager.net  name so this send trafic to traffic manger , In DNS zones we will going to create records balu.trafficmanager.net  alias balu.in      alias means its a duplicate name 
+
+for suppose www.init6tech.com  basically in GOdaddy once we create alias in DNS zones then we will get 4 DNS servers then azure DNS servers will be added to GODady ,so whenever user so whenever someone is going to access through internet this particular ABC.COM this will go to the GODADDY then back in it send to the DNS servers about the entry and when it sent information to this DNS servers here we have a records  balu.in is alias to  http://balu.trafficmanager.net  name so this send trafic to traffic manger .
+
+create DNS ZONES:
+  Name should be whatever ur doman name ur purchasing from godaddy that should be name of DNs zones like  init6tech.com we have to add ,you should give whatever the doman name u purchased it should give here 
