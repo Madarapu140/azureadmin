@@ -125,4 +125,81 @@ For   Path based routing we shouldnt keep the content in var/www/html so it shou
 mkdir men
 cd men
  /var/www/html/men 
-  
+
+copy the file to men folder
+
+cp ../index.nginx-debian.html .
+
+remove the index file in main location 
+and rm index.nginx-debian.html from    /var/www/html/men
+
+/etc/init.d/nginx restart
+
+
+--------------------------------------------
+create Application gateway 
+WAF: web application firewwall is more advanced security feature like we have an nsg rule for VM as a security and azure firewall for vnet security likewise for webapplications we have WAF
+
+Subscription
+Free Trial
+Resource group:AzureAG-RG
+Create new
+Instance details
+Application gateway name:BaluApplicationGateway
+Region:East US
+Tier:WAF V2
+Enable autoscaling:Yes
+  	
+Minimum instance count
+2
+Maximum instance count
+10
+Availability zone
+Zones 1
+HTTP2
+Disabled
+  	Enabled
+ 
+create a new WAF Policy
+(new) WAFpolicy
+Create new
+IP address type
+IPv4 only
+  	Dual stack (IPv4 & IPv6)
+ 
+Configure virtual network
+Virtual network
+AzureAG-RG-Vnet1
+Create new
+Subnet
+AzureAG-RG-subnet-3 (10.10.3.0/24)
+Manage subnet configuration
+
+  Subnet while selcting it should be with no VM integration 
+
+Frontend:
+----------------
+
+whenver u want to delete public ip first we need to dissassociate and thenn remove it 
+
+create an publicip which cant be associate with any vm 
+
+Frontend IP address type: public 
+
+create backendpools
+
+configuration 
+  we have frontend and backend ,we dont have any routing rules i,e  communication between these two is not established for this we have to create routing rules 
+
+Routing rules:
+
+In the backendpool we need to add details of all three vms
+
+poolname: homepool
+          menpool
+        womenpool  etc 
+
+withhelp of frontend we can able to login  
+
+
+
