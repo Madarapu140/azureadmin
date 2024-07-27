@@ -1,0 +1,128 @@
+Azure Application Gateway
+
+In AWS->L4 --Network loadbalancer
+        L7-- Application load balancer
+Azure--->L4--Standard load balancer
+         L7-- Application Gateway
+
+ Azure standadrd load balancer will take any kind of reuest the communication like TCP or HTTP , but APPLICATION Gateway will accept the trafic for HTTP means application gateway is dedicatedly for web servers only.but azure standard loadbalancer can webservers and also TCP trafic also .
+
+Azure loadbalancer forwarding traffic based on IP address and port,whereas Application gateway will supports Path based routing that measn when we click myntra, it shows like myntra/shop/men like wise (this is path based routing).
+
+In this senario load balancer is not checking the ip address where it is going and checking, it will check where is  the path if users were accessing myntra/shop/men then it will send it one server and myntra/shop/women then it will send it to another server ,whereas in Loadbalancer entire application  content is inside the single server  and we are having same kind of servers i,e multiple servers 3 or 4 servers based on high availability  and the sameway here as part of high availability few more servers for men server and ffew more servers for woemen server because of high availability 
+
+Endpoints:
+-------------
+In Azure, endpoints refer to network interfaces for Azure services, which enable connectivity and communication between resources. 
+
+Public Endpoints: Allow access to resources over the public internet. Examples include public IP addresses for VMs and Azure services like Azure SQL Database, which can be accessed via a public endpoint.
+Private Endpoints: Enable secure and private access to Azure services over a virtual network (VNet) using a private IP address from your VNet
+
+Azure Application Gateway
+============================
+Azure Application Gateway is a web traffic load balancer that enables you to manage traffic to your web applications. It offers several advanced features:
+
+Layer 7 Load Balancing: Operates at the application layer (Layer 7) of the OSI model. It understands HTTP, HTTPS, and WebSocket protocols.
+
+Web Application Firewall (WAF): Provides centralized protection to your web applications from common threats and vulnerabilities.
+
+SSL Termination: Offloads the SSL decryption and encryption work to the gateway, reducing the load on your web servers.
+
+URL-Based Routing: Routes traffic to backend server pools based on the URL path, enabling you to direct requests for different content to different servers.
+
+Cookie-Based Session Affinity: Ensures that requests from a particular user are always routed to the same server.
+
+Rewrite HTTP Headers: Allows you to add, remove, or modify HTTP headers as traffic passes through the gateway.
+
+End-to-End SSL: Supports encrypted connections to both the gateway and the backend servers.
+
+Use Cases:
+
+Web applications needing advanced routing and security features.
+Scenarios requiring URL-based routing, SSL offloading, or Web Application Firewall.
+
+Azure Load Balancer
+=====================
+Azure Load Balancer is a Layer 4 (transport layer) service that distributes incoming network traffic across multiple virtual machines. Its main features include:
+
+Layer 4 Load Balancing: Works at the transport layer, forwarding traffic based on IP address and port.
+
+High Availability: Distributes traffic across multiple VMs to ensure high availability and reliability.
+
+Inbound and Outbound NAT Rules: Supports network address translation rules for inbound and outbound traffic.
+
+Health Probes: Monitors the health of your application instances, directing traffic only to healthy instances.
+
+Public and Internal Load Balancing: Supports both public load balancing for internet-facing applications and internal load balancing for applications within a virtual network.
+
+Automatic Reconfiguration: Automatically adjusts to changes in your service, such as adding or removing VMs.
+
+Use Cases:
+
+Applications requiring simple load balancing across VMs.
+Scenarios needing load balancing at the transport layer without advanced routing or security features.
+
+
+--------------------------------------------------------------------------------------------
+
+Procedure:
+  We will create one RG and inside RG we will create one VNET and 2 or 3 subnets ,and this vms doesnt need public ips foronly one v we can have a public ip and for remaning 2 vms we can remove it  and creating NSGS and rules were attacehd to all the 3 vms , and create Availability set Reason for creating avalability set because we havent configured VMSS ,we have configrued here VMS ,so atleast they were expecting Vms shouldnot be in the same RACK or same server thats why min manditory ruirement is if ur going with VM u can createat least avaialbility set for it otherwise it will not accept thats why we are creating, if u are creating VMSS then availbility set is not reuired and same creating 3 VMS 
+
+
+################################ Application Gateway ##################
+
+
+######## Create Resource Group ###########
+az group create -l westus -n AzureAG-RG
+
+
+############## Create VNET and Subnet ################
+az network vnet create -g AzureAG-RG --location eastus -n AzureAG-RG-Vnet1 --address-prefix 10.10.0.0/16 \
+--subnet-name AzureAG-RG-subnet1  --subnet-prefix 10.10.1.0/24
+
+
+############## Create subnets ########################
+az network vnet subnet create -g AzureAG-RG --vnet-name AzureAG-RG-Vnet1 -n AzureAG-RG-subnet-2 --address-prefixes 10.10.2.0/24
+
+az network vnet subnet create -g AzureAG-RG --vnet-name AzureAG-RG-Vnet1 -n AzureAG-RG-subnet-3 --address-prefixes 10.10.3.0/24
+
+
+############## Create NSG & Rules ########################
+az network nsg create -g AzureAG-RG --location eastus -n Azure-RG-NSG
+
+az network nsg rule create -g AzureAG-RG  --nsg-name Azure-RG-NSG  -n Azure-RG-NSG_rule1 --priority 100 \
+--source-address-prefixes '*' --source-port-ranges '*' --destination-address-prefixes '*' \
+--destination-port-ranges '*' --access Allow --protocol Tcp --description "Allowing All Traffic  for now" 
+
+
+############# Create Availability Sets ################
+
+az vm availability-set create --name eastavset1 -g AzureAG-RG --location eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az vm availability-set create --name eastavset2 -g AzureAG-RG --location eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+az vm availability-set create --name eastavset3 -g AzureAG-RG --location eastus \
+--platform-fault-domain-count 3 --platform-update-domain-count 5
+
+###############Create Virtual Machines ######################
+
+az vm create --resource-group AzureAG-RG --name testvm-01 --image UbuntuLTS --vnet-name AzureAG-RG-Vnet1 --subnet AzureAG-RG-subnet1 \
+--admin-username cloudfreak --admin-password "Zoom@12345678" --size Standard_B1s --availability-set eastavset1 --nsg Azure-RG-NSG -l eastus
+
+az vm create --resource-group AzureAG-RG --name testvm-02 --image UbuntuLTS --vnet-name AzureAG-RG-Vnet1 --subnet AzureAG-RG-subnet-2 \
+--admin-username cloudfreak --admin-password "Zoom@12345678" --size Standard_B1s --availability-set eastavset2 --nsg Azure-RG-NSG -l eastus
+
+az vm create --resource-group AzureAG-RG --name testvm-03 --image UbuntuLTS --vnet-name AzureAG-RG-Vnet1 --subnet AzureAG-RG-subnet-3 \
+--admin-username cloudfreak --admin-password "Zoom@12345678" --size Standard_B1s --availability-set eastavset3 --nsg Azure-RG-NSG -l eastus
+
+
+###########################################################################################################################################
+
+
+For   Path based routing we shouldnt keep the content in var/www/html so it should be a separate directory like
+mkdir men
+cd men
+ /var/www/html/men 
+  
