@@ -1,0 +1,78 @@
+AWS --AUTOSCALING GROUPS
+AZURE: VMSS
+
+It is a service provided by Microsoft Azure that allows you to create and manage a group of load-balanced virtual machines (VMs)
+It’s designed to provide high availability, scalability, and load balancing for applications that need to handle varying levels of traffic
+
+Key Features of VMSS:
+ Auto-scaling: VMSS can automatically increase or decrease the number of VMs based on demand or a defined schedule.
+Load Balancing: VMSS integrates with Azure Load Balancer to distribute incoming traffic across the VMs in the scale set, ensuring that the load is balanced and no single VM is overwhelmed.
+High Availability: VMSS can distribute VMs across availability zones, regions, or fault domains to ensure that applications remain available even if there’s a failure in one part of the infrastructure.
+Integrated with Azure Services: VMSS integrates with other Azure services like Azure Monitor, Azure Advisor, and Azure Automation, providing insights and recommendations to optimize your VMSS deployments.
+
+
+Work-flow:
+ Basically as part of businesss u brought one server in the Azure cloud  and selcted some operating system and on Top of that u run some applications obviously to access it from interente u should have public IP ,it will come to public IP and mapped with doman name but when there is a huge growth slowly as ur App or site becoming more popular ,single server is not sufficient and ur adding more servers ,when the more servers were increased then we cant have more each machine pubilcIP and domain names  so all togetehr we are going to have a load balancer here loadbalancer will distributes load ekually to al the VMS ,all these machine IPS will be integrated with loadbalncer ,and load balncer will receive the traffic and distributes ekually trafic yto all backend pools of  vms .
+ bUt lets say if we look into Hotstar  , when it is hosting IPL , most of the people will subscribe hotstar and a lot of taffic accross the INDIA or across the WORLD during this time obviously huge load on this servers by default hotstar is having some 20 servers till now for their applications , when lot of trafic is comming to servers this existing capacity is not sufficient ,so for this time being u need to arrange few more servers like before stating of IPL will purchace few more servers and mae sure this machines were ready and we will install our applications  , if traditional data centers obviously we need to buy servers and configure it install operating systems and install applications ,after the IPL is completewe are going to delete the vms and 
+Second thing is if ur expecting trafic is between XYZ and beyond ur expectation a lot of trafic is comming and then what we are going to do immediately we need create more VMS and u need to add this in backend pool of the loadbalncer but it is taking time by that time existing vms have a lot of load and make it ready , so instaed of all this connfiguration u can configure AUTOSACLING  which is caled as virtual machine scale set .
+
+ONce u configure VMSS based upon whatever u configure depends upon huge load automatically servers will get created and automatically servers will get deleted ,There was one app AHA which is vvery well known to telugu people ,a lot of interviews will happens for telugu celebreties and they hosted in that APP one day One of the clebrity ,PAN indian actor PRABASH intervir=ew is going to happen on AHA then most of the people were trying to watch the interview and suddenly huge trffic was diverved to AHA TV and completely app was crashed because they didnt expect those many people will watch ,when they interveiw as released the APP itself crashed because lot f people tryung see the interview but backend servers were busy and application and application was not responding ,when application is not responding then frontend users cant able to access it and  this is unexpected , NOW a days in current situation when ur using cloud we should overcome those kind of scenarios .
+
+when ur using cloud if all of the sudden you dont know something become popular and over a night a lot of traffic is comming to your website  to an app so need to handle it otherwise it may crash , INCASE of cloud no need to worry because As a Administratoreven though with a huge load  without ur intervention servers will be created automaticaly and trafic will be distributed servers so for that purpose u need to configure autosacalling , Now a days evry application will be configured with autosacling option if it is for production environment .
+
+To achieve autosacling concept for that we will take one VM and inside this vm we will take linux operating system on top of that we will install the applications that application rekuired softwares ,dependencies, librires will be installed inside the VM and once it is done we will take the IMAGE OF THIS MACHINE and this Image we are going to use it for VMSS , So whenver we are configuring VMSS we dont use native images like ubuntu, windows images which was provided by azure which contans only opertaing systems but we need the operating system with our application as well as right 
+
+
+procedure:
+================
+1. create an VM and take an image from VM 
+    we will create Vm and take image from VM and install nginx and take ip address and ccess it weaather it is running or not and then when we create VMSS the machines laso should able to do sanme thing ,once VMSS is creTED and added to load balncer or already u have load balncer and while creating VMSS we can attach it to VMSS but witout loadblancer creating VMSS is no use 
+2. Create an image 
+we can share this image to image compute gallery and also we can share it to anyone
+3.ONCE machine is ready u can poweroff machine and take image 
+install nginx 
+  sudo su -
+ apt update && apt install nginx 
+ /etc/init.d/nginx status    to check the ngnix
+ systemctl enable nginx  ( This will make u service is available during  boot time  also otherwise whenver u reboot ur machine till service will not come oneline unless manualy ou stat it )
+
+4. select capture option and from VM / snapshot of VM and  
+Automatically delete this virtual machine after creating the image option to be enbled 
+
+whenver we create image from VM we have 2 option sto store  Share image to Azure compute gallery
+Yes, share it to a gallery as a VM image version. ( It means we are storing or created image across globally)
+No, capture only a managed image.( it means within our subscription only we are storing ) 
+
+Operating system state
+Generalized: VMs created from this image require hostname, admin user, and other VM related setup to be completed on first boot
+Specialized: VMs created from this image are completely configured and do not require parameters such as hostname and admin user/password
+
+we can share the custom image to our team members within the organisation by defining the RBAC rules .
+
+5. Create VMSS
+----------------------
+ Orchestration
+A scale set has a "scale set model" that defines the attributes of virtual machine instances (size, number of data disks, etc). As the number of instances in the scale set changes, new instances are added based on the scale set model.Learn more about the scale set model
+Orchestration mode
+Flexible: achieve high availability at scale with identical or multiple virtual machine types ( Depends on need)
+Uniform: optimized for large scale stateless workloads with identical instances
+
+Networking:
+--------------
+ we can use existing newtwork or we can create new networking components as well as
+ PTR: One nic card can be used for four Vms
+
+whenevr we create VMSS the min 4 and max 100 something we defined in networking then first 4 vms will consider one nic 
+
+Loadbalancing:
+  -------------------
+ either u can create new load balancer here or else u can select existing load balancer 
+If u selcted NONE option here , first VMSS will be created and later u can attach this loadbalancer to VMSS
+
+SCALING:
+---------------
+scaling policy:
+  a) manually
+   b) custom: mostly prefered in industry by adjusting CPU percentage and based on demand it willl scaleup or scale down 
+
+PTR: Preview feature in cloud shouldnt be used in production 
