@@ -1,0 +1,43 @@
+ Network Security Group(NSG) & Application Security Group(ASG)  ( cloudcomputing in telugu) 
+
+    NSG: 
+This will controls the trafic in the vms
+NSG contains security rules which that allows inbound and outbound network rules
+For each rule u can specify source,destination ,port and protocol.
+Using NSG we can allow and deny the traffic.
+
+where NSG can be applied?
+-------------------------
+ It can be applied in 2 places
+a) subnet : If NSG applied at subnet level then all the services/servers which has provisioned under the subnet needs to follow the that NSG rules .
+b) NIC(network interface card): NSG can be applied on top of the NIC card .Actually NIC will be attached to vm that means here only one VM obeys the rules and follow NSG rule for both incoming /outgoing traffic.
+
+default inbound security rules starting from 65000( which will allow all inbound rules)
+65500 (which will deny all the outbound rules)
+
+
+Service tag in azure:
+=====================
+  Few of the microssoft PAAS service   services like storage accounts,app services, function apps and logic apps SKUL services all these were the microsoft provided platform as a service,By default PAAS  will not have ipaddresses, those services we dont know the exact  ip address in that situations these services if they want to access the our services / networks it is not possible with ipaddresses  .
+
+eg: if any PAAS services like storage accounts  wants to access our network like  storage account is in other region and that wants to accesss our network then we will specifiy the service tags that means  storage.eastus ( here we are definig storage accounts in eastus have permissions to access the network)
+
+microsoft services that wants to access our network or our network wnats to access the microsoft services then we will use service tags concept here 
+
+services  PORT number  
+SSH =22
+RDP  = 3389 
+HTTPS =443 
+HTTP =80
+
+
+source/destination will have 5 services
+  ANY
+ MYIpaddress
+ IP-address
+ Service-Tag
+Application security group
+
+If priority number is lowest then it having highest priority 
+ 
+
