@@ -39,5 +39,133 @@ source/destination will have 5 services
 Application security group
 
 If priority number is lowest then it having highest priority 
- 
 
+
+==================================================================================
+ASG(Application security group)
+It helps in grouping of VMS
+Suppose if u have 10 vms and out of 5 u would like to allow RDP and remaining 5 HTTP protocal then , going indidvidaul any creating nsgs for 10 vms , create groups for ASG and keep 5 ASGS iof RDP in one and 5 HTTP protocol in anther asg we can easily integrate with our network 
+
+Always try to reduce the no of NSG s  and also nsg rules as well as 
+ASG  helps in providing sepecific access to specific machines 
+ 
+Level of Operation: NSGs operate at the network interface or subnet level, while ASGs operate at the application layer, grouping VMs based on their role.
+
+
+process:
+ -------------
+create ASG in azure
+associate  ASG to VM 
+Create NSG and source is any and destination to be ASG of VM 
+
+Demo:
+ we will create a VNET, for this vnet we will create a firewall behind firewall we will setup subnet lets called it as web application subnet in this subnet we will deploy an VM and in this vm we will install Nginx . Any enduser wants to access ur application in a subnet , here particular instance only have private ip address ,you cant directly ssh into a private ip , first we will create bastion host and from bastion host we will connect to VM , Any one who is having access to bastion they can use and also one bastion can be used for many VMS to connect 
+
+steps:
+ 1. create an resource group
+ 2. create Vnet ,  Enable azure bastion in security tab , Enable azure firewall 
+ 3. create VM , use Authentication type : SSH public key, here in networking tab select subnet: default i,e Webapplication subnet ,publicip should be : None because i want it to be behind the firewall and it to be in private subnet , 
+Advanced tab -->Custom data and cloud init
+4. configure the firewall
+     If someone access the ip address of this firewall on a particular port will farword the reuest to VM 
+  Firewall --> click on firewall policy -->DNAT rules i,e DNAT (Destination Network Address Translation) is a type of Network Address Translation (NAT) DNAT is commonly used in scenarios where you want to expose internal servers or services to external clients while hiding the internal IP addresses.
+
+  DNAT RULES--> Add a rule collection --> add and create add rule -->
+here our ip is source ip and we are trying to access our application from our end ( If we put * measn allowying everyone)
+Destination Ip is Firewall IP 
+
+Azure bastion:
+ Azure Bastion is a paid service that provides secure RDP/SSH connectivity to your virtual machines over TLS. When you connect via Azure Bastion, your virtual machines do not need a public IP address.
+
+Azure Firewall is a managed cloud-based network security service that protects your Azure Virtual Network resources.
+Azure DDoS Network Protection is a service designed to safeguard Azure resources from Distributed Denial of Service (DDoS) attacks. DDoS attacks aim to overwhelm a network, service, or application by flooding it with excessive traffic, potentially causing service disruption.
+
+
+when we create vnet that time by default it will allocate one subnet to AzureBastionsubnet, Azurefirewallsubnet,AzureFirewallManagement subnets
+
+
+Technically till now we have created virtual network and we have created 4 subnets 1. firewall,2.firewallmanager3.Bastion and 4 . Web application that we are going to deploy , additionaly u can create any no.of subnets lets say when ur deaing with 3 tier application we can create a database subnet ,even after creating of vnet u can create a these subnets 
+
+Now we are going to create an application in default subnet which is webapplication subnet .
+
+In realtime resource groups were maintaned projects-environment 
+
+Advanced tab -->Custom data and cloud init
+Pass a cloud-init script, configuration file, or other data into the virtual machine while it is being provisioned. The data will be saved on the VM in a known location
+
+here we are using cloudinit script which u can put in yur custom data and what it does is during the creation of VMS the scripts get automatically triggers Nginx as well as HTML page is going to deployed this is used during the autosacling process this comes mostly handy when we are using the autoscaing because automaticaly u have to scale ur instance to 2 or 3 intsances depends on demand when this things happens automaticaly, the application also to be deployed automatically 
+
+userdata:
+------------
+it is basically u dont want the code to be executed while the creation but you wanst to pass some files to this vm ,once vm is created lets say u wants ur scripts to be in a particular location then we will go with userdata 
+
+customdata:
+-------------
+It only when u create vm it gets executed 
+
+create a vm 
+
+PTR: After creation of vM , u should identify that there would be no Public IP address,because we are deploying our application in it , we will ssh into vm via Bastion Host 
+
+Bastion:
+-------------
+Bastion is also available on AWS but azure makes it little simple by providing it as a service within the azure , basicaly we will create Vm and make use them as bastion but it is providing as a servcie in azure so it would be easy .
+
+when u create a Vnet there it self we can select the option as Bastion .
+
+Purpose of bastion:
+  It is used as a proxy between the developers or devops engineers and application installed on the private instance.
+  Bastion helps u to configure proper IAM policies or proper Identity policies where only certailn people can acceess this bastion and access the private instance ,like wwe can restrict the people to access the VM and also we can also have the complete information whoever accessing the instance and also we can add the security rules at bastion level 
+
+
+After creation of VM   ---> Bastions  -->
+ Authentication Type:SSH Private Key from Local File
+Username:azureuser
+Local File
+"nginx-vm_key.pem"
+
+
+Here we have to selct the auathentication type as  SSH Private Key from Local File, and username as azureuser and pem file which we downloaded earlier 
+  Things to perform on Bastion:
+           sudo su - 
+         apt-get update
+      apt install nginx -y
+        /etc/init.d/nginx status
+      cd /var/www/html 
+        vim index.html ( create a new file)
+        Restart Nginx
+sudo systemctl restart nginx
+curl localhost:80
+
+-----------------------------
+
+Firewall-->Firewall policy -->
+Add a DNAT rule
+The rule will be added to the selected rule collection upon saving.
+Rule collection group
+DefaultDnatRuleCollectionGroup
+Rule collection
+firewall-nginx-rule
+Name
+Firewall-nginx-DNAT
+Source Type
+IP Address
+Source IP Addresses
+106.222.230.131
+Destination IP Addresses( FIREWALL PORT)
+23.96.97.111
+Protocol
+TCP
+Destination Ports
+4000
+Translated Type
+IP address
+Translated Address
+10.0.0.4( our vm private ip) 
+Translated Port
+80
+---------------------------------------
+overall implementation
+This is my laptop and there was azure VNET ,inside vnet we have setup a firewall subnet and installed the firewall and i have setup subnet for webapplication and installed webapplication init and here we configured that anything that comes from my latop then firewall has to bypass it and pass the rekust to webapplication i,e nginx  and in firewall we specified that when someone is trying to access firewall ipaddress :4000(port )
+
+firewall ip: 4000 (port) we can able toa acess 
